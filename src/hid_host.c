@@ -1184,7 +1184,7 @@ esp_err_t hid_host_device_open(hid_host_device_handle_t hid_dev_handle,
 
   HID_RETURN_ON_INVALID_ARG(hid_iface);
 
-  HID_RETURN_ON_FALSE((hid_iface->dev_params.proto >= HID_PROTOCOL_NONE) &&
+  HID_RETURN_ON_FALSE((hid_iface->dev_params.proto >= HID_PROTOCOL_UNKNOWN) &&
                           (hid_iface->dev_params.proto < HID_PROTOCOL_MAX),
                       ESP_ERR_INVALID_ARG, "HID device protocol not supported");
 

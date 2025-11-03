@@ -3,6 +3,7 @@
  *
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
  */
+#include "hid.h"
 #include <Arduino.h>
 #include "driver/gpio.h"
 #include "usb/usb_host.h"
@@ -20,7 +21,7 @@ static const char *TAG = "example";
 QueueHandle_t hid_host_event_queue;
 bool user_shutdown = false;
 
-BleKeyboard bleKeyboard;
+BleDevice bleKeyboard;
 
 /**
  * @brief HID Host event
@@ -353,7 +354,7 @@ static void hid_host_mouse_report_callback(const uint8_t *const data,
 static void hid_host_generic_report_callback(const uint8_t *const data,
                                              const int length)
 {
-  hid_print_new_device_report_header(HID_PROTOCOL_NONE);
+  hid_print_new_device_report_header(HID_PROTOCOL_UNKNOWN);
   for (int i = 0; i < length; i++)
   {
     printf("%02X", data[i]);
@@ -597,7 +598,9 @@ void app_main(void)
 }
 
 void setup() { 
+  
   app_main(); 
+  bleKeyboard.begin();
 }
 
 void loop() {}
