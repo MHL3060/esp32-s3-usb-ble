@@ -276,6 +276,7 @@ static void hid_host_keyboard_report_callback(const uint8_t *const data,
   hid_keyboard_input_report_boot_t *kb_report =
       (hid_keyboard_input_report_boot_t *)data;
 
+  
   if (length < sizeof(hid_keyboard_input_report_boot_t))
   {
     return;
@@ -309,6 +310,9 @@ static void hid_host_keyboard_report_callback(const uint8_t *const data,
   }
 
   memcpy(prev_keys, &kb_report->key, HID_KEYBOARD_KEY_MAX);
+  uint8_t buffer[length] = {};
+  memcpy(buffer, data, length);
+  bleKeyboard.sendKeyboardReport(buffer, length);
 }
 
 /**
