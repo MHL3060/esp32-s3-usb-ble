@@ -145,9 +145,9 @@ typedef enum {
     HID_KEY_COPY                                                                  = 0x7C,
     HID_KEY_PASTE                                                                 = 0x7D,
     HID_KEY_FIND                                                                  = 0x7E,
-    HID_KEY_MUTE                                                                  = 0x7F,
-    HID_KEY_VOLUME_UP                                                             = 0x80,
-    HID_KEY_VOLUME_DOWN                                                           = 0x81,
+   // HID_KEY_MUTE                                                                  = 0x7F,
+   // HID_KEY_VOLUME_UP                                                             = 0x80,
+    // HID_KEY_VOLUME_DOWN                                                           = 0x81,
     HID_KEY_LOCKING_CAPS_LOCK                                                     = 0x82,
     HID_KEY_LOCKING_NUM_LOCK                                                      = 0x83,
     HID_KEY_LOCKING_SCROLL_LOCK                                                   = 0x84,
@@ -236,7 +236,11 @@ typedef enum {
     HID_KEY_RIGHT_CONTROL                                                         = 0xE0,
     HID_KEY_RIGHT_SHIFT                                                           = 0xE1,
     HID_KEY_RIGHT_ALT                                                             = 0xE2,
-    HID_KEY_RIGHT_GUI                                                             = 0xE3
+    HID_KEY_RIGHT_GUI                                                             = 0xE3,
+    HID_KEY_VOLUME_UP                                                             = 0xE9,
+    HID_KEY_VOLUME_DOWN                                                           = 0xEA,
+    HID_KEY_MUTE                                                                  = 0xE2,
+    HID_KEY_PLAY_PAUSE                                                            = 0xCD,
 } __attribute__((packed)) hid_key_t;
 
 // Modifier bit mask

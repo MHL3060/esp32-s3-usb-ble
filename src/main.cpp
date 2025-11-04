@@ -7,21 +7,26 @@
 #include <Arduino.h>
 #include "driver/gpio.h"
 #include "usb/usb_host.h"
-
+#include "atomic_counter.h"
+#include "esp_bt_main.h"
 #include "hid_host.h"
 #include "hid_usage_keyboard.h"
 #include "hid_usage_mouse.h"
 
 #include "BleDevice.h"
 
-/* GPIO Pin number for quit from example logic */
+
 #define APP_QUIT_PIN GPIO_NUM_0
 
-static const char *TAG = "example";
+static const char *TAG = "USB_TO_BLE_BRIDGE";
 QueueHandle_t hid_host_event_queue;
 bool user_shutdown = false;
 
 BleDevice bleKeyboard;
+uint32_t total_word_count;
+
+AtomicCounter atomicCounter;
+hw_timer_t * my_timer;
 
 /**
  * @brief HID Host event
@@ -38,7 +43,7 @@ typedef struct
 /**
  * @brief HID Protocol string names
  */
-static const char *hid_proto_name_str[] = {"NONE", "KEYBOARD", "MOUSE"};
+static const char *hid_proto_name_str[] = {"UNKOWN", "KEYBOARD", "MOUSE"};
 
 /**
  * @brief Key event
@@ -276,9 +281,10 @@ static void hid_host_keyboard_report_callback(const uint8_t *const data,
   hid_keyboard_input_report_boot_t *kb_report =
       (hid_keyboard_input_report_boot_t *)data;
 
-  
-  if (length < sizeof(hid_keyboard_input_report_boot_t))
+  uint8_t size = sizeof(hid_keyboard_input_report_boot_t);
+  if (length < size)
   {
+    ESP_LOGI(TAG, "not handle");
     return;
   }
 
@@ -313,6 +319,8 @@ static void hid_host_keyboard_report_callback(const uint8_t *const data,
   uint8_t buffer[length] = {};
   memcpy(buffer, data, length);
   bleKeyboard.sendKeyboardReport(buffer, length);
+  total_word_count += length/8;
+  ESP_LOGI(TAG, "%d\n", total_word_count);
 }
 
 /**
@@ -558,7 +566,7 @@ void hid_host_device_callback(hid_host_device_handle_t hid_device_handle,
 void app_main(void)
 {
   BaseType_t task_created;
-  ESP_LOGI(TAG, "HID Host example");
+  ESP_LOGI(TAG, "");
 
   /*
    * Create usb_lib_task to:
@@ -601,10 +609,33 @@ void app_main(void)
   assert(task_created == pdTRUE);
 }
 
-void setup() { 
+void IRAM_ATTR onTimer(){
+  //if no activity
+  // esp_deep_sleep(100);
+  /**
+   * deep sleep will cycle the power.
+   * 
+   */
+  uint32_t after = atomicCounter.add(1);
+  ESP_LOGI(TAG, "time=%d", after);
+  if (after > 1) {
+    // esp_bluedroid_disable();
+    
+    esp_deep_sleep_start();
+  }
+  
+}
+
+void setup() {
   
   app_main(); 
   bleKeyboard.begin();
+
+  my_timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(my_timer, &onTimer, true);
+  timerAlarmWrite(my_timer, 60000000, true);
+  timerAlarmEnable(my_timer);
+  total_word_count = 0;
 }
 
 void loop() {}
